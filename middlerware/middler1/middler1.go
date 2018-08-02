@@ -21,32 +21,27 @@ func (middlers Middlers) Apply(h http.Handler) http.Handler {
 	return middlers[:last].Apply(middlers[last](h))
 }
 
-//func LoggingMiddler(logger *log.Logger) Middler {
-func LoggingMiddler() Middler {
+func LoggingMiddler(h http.Handler) http.Handler {
 	log.Println("Initialised LoggingMiddler1")
 
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			log.Println("Logging before")
-			defer log.Println("Logging after")
-			h.ServeHTTP(w, r)
-		})
-	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Logging before")
+		defer log.Println("Logging after")
+		h.ServeHTTP(w, r)
+	})
 }
 
-func TracingMiddler() Middler {
+func TracingMiddler(h http.Handler) http.Handler {
 	log.Println("Initialised TracingMiddler1")
 
 	requestID := rand.Int63()
 
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 
-			log.Printf("requestID %d: start %s", requestID, start)
-			defer log.Printf("requestID %d: took %s", requestID, time.Since(start))
+		log.Printf("requestID %d: start %s", requestID, start)
+		defer log.Printf("requestID %d: took %s", requestID, time.Since(start))
 
-			h.ServeHTTP(w, r)
-		})
-	}
+		h.ServeHTTP(w, r)
+	})
 }
