@@ -43,11 +43,11 @@ func main() {
 
 	// applying a sequence of middlers - they are applied in the opposite sequence
 	// to how they were provided
-	http.Handle("/hi", middler2.Wrap(hiHandler, middler2.LoggingMiddler(logger), middler2.TracingMiddler()))
+	http.Handle("/hi", middler2.Apply(hiHandler, middler2.LoggingMiddler(logger), middler2.TracingMiddler()))
 
 	// applying a sequence of middlers - they are applied in the same sequence
 	// as they were provided
-	http.Handle("/bye", middler2.ReverseWrap(byeHandler, middler2.LoggingMiddler(logger), middler2.TracingMiddler()))
+	http.Handle("/bye", middler2.ReverseApply(byeHandler, middler2.LoggingMiddler(logger), middler2.TracingMiddler()))
 
 	// some browsers request /favicon.ico, even though the server is not. This is to avoid
 	// the annoyance through serving an empty favicon to avoid the middleware effect

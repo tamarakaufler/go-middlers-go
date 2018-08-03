@@ -9,7 +9,11 @@ import (
 
 // Middler is a function which receives an http.Handler and returns another http.Handler.
 // Typically, the returned handler is a closure which does something with the http.ResponseWriter and http.Request passed to it, and then calls the handler passed as parameter to the MiddlewareFunc.
+// (comment from gorilla middleware)
 type Middler func(http.Handler) http.Handler
+
+// User creates an empty Middling instance, which is then populated with Middlers
+// using the Use method
 type Middling struct {
 	middlers []Middler
 }
@@ -22,7 +26,7 @@ type middlerware interface {
 // Middlerware allows Middler to implement the middleware interface
 // and so, to be of type middleware.
 // Other middleware implementations (not of the Middler type) must
-// implement their own Middleware.
+// implement their own Middleware method.
 func (m Middler) Middlerware(handler http.Handler) http.Handler {
 	log.Println("\t>> Middleware")
 	return m(handler)
@@ -30,7 +34,7 @@ func (m Middler) Middlerware(handler http.Handler) http.Handler {
 
 // Use appends a Middler to the Middlers chain. Middlers can intercept and/or
 // modify requests and/or responses. They are executed in the order that they
-// are applied. Different Middlers chains can be created to be applied to
+// are applied. Different Middlings with Middler chains can be created to be applied to
 // different routes.
 func (middling *Middling) Use(m Middler) {
 	middling.middlers = append(middling.middlers, m)
@@ -58,12 +62,12 @@ func LoggingMiddler(logger *log.Logger) Middler {
 	logger.Println("Initialised LoggingMiddler3")
 
 	return func(h http.Handler) http.Handler {
+
+		// This handler is run when a route is requested
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			logger.Println("Logging in LoggingMiddler before")
-			defer logger.Println("Logging in LoggingMiddler after")
-
-			// This is where the handler is actually run, ie when a route is requested
 			h.ServeHTTP(w, r)
+			logger.Println("Logging in LoggingMiddler after")
 		})
 	}
 }
@@ -74,6 +78,8 @@ func TracingMiddler() Middler {
 	requestID := rand.Int63()
 
 	return func(h http.Handler) http.Handler {
+
+		// This handler is run when a route is requested
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
 
@@ -81,10 +87,8 @@ func TracingMiddler() Middler {
 			defer log.Println("Logging in TracingMiddler after")
 
 			log.Printf("requestID %d: start %s", requestID, start)
-			defer log.Printf("requestID %d: took %s", requestID, time.Since(start))
-
-			// This is where the handler is actually run, ie when a route is requested
 			h.ServeHTTP(w, r)
+			log.Printf("requestID %d: took %s", requestID, time.Since(start))
 		})
 	}
 }

@@ -10,19 +10,9 @@ import (
 type Middler func(http.Handler) http.Handler
 type Middlers []Middler
 
-// // Apply applies middleware from the last one provided, ie
-// // the one closest to the route handler
-// func (middlers Middlers) Apply(h http.Handler) http.Handler {
-// 	if len(middlers) == 0 {
-// 		return h
-// 	}
-
-// 	last := len(middlers) - 1
-// 	return middlers[:last].Apply(middlers[last](h))
-// }
-
 // Apply applies middleware from the first one provided, ie
-// sequentially
+// sequentially, ie the middleware is run from the last one provided
+// to the first one.
 func (middlers Middlers) Apply(h http.Handler) http.Handler {
 	if len(middlers) == 0 {
 		return h

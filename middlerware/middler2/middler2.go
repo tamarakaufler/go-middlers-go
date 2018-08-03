@@ -9,17 +9,20 @@ import (
 
 type Middler func(http.Handler) http.Handler
 
-// Wrap and ResverseWrap apply a sequence of middlers. An example usage:
-// http.Handle("/hi", Wrap(hiHandler, LoggingMiddler(logger), TracingMiddler()))
-// http.Handle("/hi", ReverseWrap(hiHandler, LoggingMiddler(logger), TracingMiddler()))
-func Wrap(h http.Handler, middlers ...Middler) http.Handler {
+// Apply runs a sequence of middlers starting from the last one provided.
+// An example usage:
+// 			http.Handle("/hi", Wrap(hiHandler, LoggingMiddler(logger), TracingMiddler()))
+func Apply(h http.Handler, middlers ...Middler) http.Handler {
 	for _, middler := range middlers {
 		h = middler(h)
 	}
 	return h
 }
 
-func ReverseWrap(h http.Handler, middlers ...Middler) http.Handler {
+// ReverseApply applies a sequence of middlers starting from the first one provided.
+// An example usage:
+// 			http.Handle("/hi", ReverseWrap(hiHandler, LoggingMiddler(logger), TracingMiddler()))
+func ReverseApply(h http.Handler, middlers ...Middler) http.Handler {
 	l := len(middlers)
 	for i := l - 1; i >= 0; i-- {
 		h = middlers[i](h)
