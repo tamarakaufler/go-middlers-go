@@ -116,7 +116,7 @@ and
 
 ```
 type Middling struct {
-	middlers []middleware
+	middlers []middlerware
 }
 ```
 
