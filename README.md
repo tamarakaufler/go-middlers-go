@@ -15,7 +15,7 @@ All three approaches define a Middler type, a function with the following signat
 
 All implementations provide two off the shelf Middlers, one for logging, one for tracing.
 
-Example of a logging Middler:
+Examples of a logging Middler:
 
 ```
 func LoggingMiddler(h http.Handler) http.Handler {
@@ -34,6 +34,29 @@ func LoggingMiddler(h http.Handler) http.Handler {
 		defer log.Println("Logging in LoggingMiddler after")
 		h.ServeHTTP(w, r)
 	})
+}
+```
+
+or
+
+```
+// LoggingMiddler is logging middleware. An example usage:
+// http.Handle("/", LoggingMiddler(logger)(routeHandler))
+func LoggingMiddler(logger *log.Logger) Middler {
+	logger.Println("Initialised LoggingMiddler2")
+
+	// This is the returned Middler --------^
+	return func(h http.Handler) http.Handler {
+
+		// This is the returned http.Handler ^
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			logger.Println("Logging in LoggingMiddler before")
+			logger.Printf("\t%s", r.RequestURI)
+
+			defer logger.Println("Logging in LoggingMiddler after")
+			h.ServeHTTP(w, r)
+		})
+	}
 }
 ```
 
@@ -62,7 +85,7 @@ func (middlers Middlers) Apply(h http.Handler) http.Handler {
 }
 ```
 
-Example os a routing setup:
+Example of a routing setup:
 ```
 	m1 := middler1.Middlers{middler1.TracingMiddler, middler1.LoggingMiddler}
 	router.HandleFunc("/hi", hiHandler)
