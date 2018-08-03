@@ -23,7 +23,7 @@ func LoggingMiddler(h http.Handler) http.Handler {
   // h is either the route handler, or another Middler
   // wrapping either the route handler or another Middler.
   // -----------------------------------------------
-	log.Println("Initialised LoggingMiddler1")
+  log.Println("Initialised LoggingMiddler1")
 
   // This handler is run when the route is requested
   // -----------------------------------------------
