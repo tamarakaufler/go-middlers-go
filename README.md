@@ -105,17 +105,18 @@ http.Handle("/hi", middler2.Apply(hiHandler,
   - examples/example3/main.go
 
 The implementation introduces two new types:
+
 ```
-type Middling struct {
-	middlers []Middler
+type middlerware interface {
+	Middlerware(handler http.Handler) http.Handler
 }
 ```
 
 and
 
 ```
-type middlerware interface {
-	Middlerware(handler http.Handler) http.Handler
+type Middling struct {
+	middlers []middleware
 }
 ```
 
@@ -142,6 +143,9 @@ b) Applying the middlerware on routes:
 
 	// applying just one middler
 	http.Handle("/bye", byeMiddling.Apply(byeHandler))
+
+An implementation of a custom middlerware (uthentication fot the /piggybank route)
+is shown in middlerware.go.
 
 # Related reading
 

@@ -15,7 +15,7 @@ type Middler func(http.Handler) http.Handler
 // User creates an empty Middling instance, which is then populated with Middlers
 // using the Use method
 type Middling struct {
-	middlers []Middler
+	middlers []middlerware
 }
 
 // whatever implements the middlerware interface qualifies as middleware
@@ -36,7 +36,7 @@ func (m Middler) Middlerware(handler http.Handler) http.Handler {
 // modify requests and/or responses. They are executed in the order that they
 // are applied. Different Middlings with Middler chains can be created to be applied to
 // different routes.
-func (middling *Middling) Use(m Middler) {
+func (middling *Middling) Use(m middlerware) {
 	middling.middlers = append(middling.middlers, m)
 	log.Printf(">> Use: %d", len(middling.middlers))
 }

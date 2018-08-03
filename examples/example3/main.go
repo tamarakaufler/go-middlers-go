@@ -33,6 +33,13 @@ func main() {
 		w.Write([]byte("Bye world. I am going to sleep"))
 	})
 
+	piggyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		time.Sleep(2 * time.Second)
+		log.Printf("%s", r.RequestURI)
+		w.Write([]byte("Had a peep in my piggybank :)"))
+	})
+
 	// for middleware
 	logger := log.New(os.Stdout, "with-middler3: ", log.LstdFlags)
 
@@ -46,6 +53,13 @@ func main() {
 	byeMiddling := &middler3.Middling{}
 	byeMiddling.Use(middler3.TracingMiddler())
 
+	auth := &Auth{
+		Username: "Tamara",
+	}
+	authMiddling := &middler3.Middling{}
+	authMiddling.Use(middler3.LoggingMiddler(logger))
+	authMiddling.Use(auth.Middlerware())
+
 	// routing
 	// -------
 
@@ -58,8 +72,12 @@ func main() {
 	// applying just one middler, different than for the root route
 	http.Handle("/bye", byeMiddling.Apply(byeHandler))
 
-	// some browsers request /favicon.ico, even though the server is not. This is to avoid
-	// the annoyance through serving an empty favicon to avoid the middleware effect
+	// applying one Middler and one custom middler
+	http.Handle("/piggybank", authMiddling.Apply(piggyHandler))
+
+	// Some browsers request /favicon.ico, even though the server does not.
+	// The following is added to avoid the annoyance through serving an empty
+	// favicon to avoid the middleware effect
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./favicon.ico")
 	})
