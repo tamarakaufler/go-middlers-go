@@ -172,6 +172,8 @@ is shown in middlerware.go.
 
 # Related reading
 
+Many ways to approach the middleware implementations:
+
 https://medium.com/@matryer/the-http-handler-wrapper-technique-in-golang-updated-bc7fbcffa702
 
 https://drstearns.github.io/tutorials/gomiddleware/
@@ -179,3 +181,5 @@ https://drstearns.github.io/tutorials/gomiddleware/
 https://hackernoon.com/simple-http-middleware-with-go-79a4ad62889b
 
 https://gowebexamples.com/advanced-middleware/
+
+https://drstearns.github.io/tutorials/gomiddleware/
